@@ -34,6 +34,7 @@ async function run() {
 
     //... 
     const coffeeSCollection = client.db("coffeeDB").collection('coffees')
+    const usersCollection = client.db("coffeeDB").collection("users")
 
 
     // Get method
@@ -80,6 +81,42 @@ async function run() {
       const result = await coffeeSCollection.deleteOne(query)
       res.send(result)
     })
+
+   // user related data
+                  app.get("/users" , async(req,res) =>{
+                     const result = await usersCollection.find().toArray()
+                     res.send(result)
+                  })
+
+
+                 app.post("/users" ,async(req,res) =>{
+                     const userProfile = req.body;
+                     console.log(userProfile)
+                     const result = await usersCollection.insertOne(userProfile)
+                     res.send(result)
+                 })
+         // single input update        
+                 app.patch("/users",async(req,res) =>{
+                  const {email,lastSignInTime}= req.body
+                  const filter = {email:email}
+                  const updateDoc = {
+                    $set :{
+                      lastSignInTime:lastSignInTime
+                    }
+                  }
+                  const result = await usersCollection.updateOne(filter,updateDoc)
+                  res.send(result)
+                 })
+
+
+                 app.delete("/users/:id" , async(req,res) =>{
+                  const id = req.params.id
+                  const query = {_id: new ObjectId(id)}
+                  const result = await usersCollection.deleteOne(query)
+                  res.send(result)
+                 })
+
+              
 
 
     // Send a ping to confirm a successful connection
